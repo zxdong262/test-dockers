@@ -16,7 +16,7 @@ console.log(`Username: ${config.username}`);
 conn.on('ready', () => {
   console.log('✓ SSH connection established successfully!');
   
-  conn.exec('whoami', (err, stream) => {
+  conn.exec('which trz && which tsz', (err, stream) => {
     if (err) {
       console.error('✗ Error executing command:', err);
       conn.end();
@@ -24,7 +24,7 @@ conn.on('ready', () => {
     }
     
     stream.on('data', (data) => {
-      console.log(`✓ Command output: ${data.toString().trim()}`);
+      console.log(`✓ trzsz commands found:\n${data.toString().trim()}`);
     });
     
     stream.stderr.on('data', (data) => {

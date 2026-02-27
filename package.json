@@ -1,0 +1,11 @@
+{
+  "name": "test-dockers",
+  "version": "1.0.0",
+  "description": "Test Docker configurations",
+  "scripts": {
+    "test": "node test-ssh.js"
+  },
+  "dependencies": {
+    "ssh2": "^1.15.0"
+  }
+}
