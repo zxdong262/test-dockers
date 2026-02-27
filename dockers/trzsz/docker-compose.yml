@@ -1,0 +1,16 @@
+services:
+  trzsz:
+    build: .
+    container_name: trzsz-container
+    ports:
+      - "22234:22"
+    restart: unless-stopped
+    networks:
+      - trzsz-network
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+
+networks:
+  trzsz-network:
+    driver: bridge
