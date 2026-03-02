@@ -34,6 +34,25 @@ Ubuntu 24.04 based container with trzsz installed and SSH service.
   ```
 - **Testing**: SSH connection test using ssh2 library
 
+### scp-only
+
+Ubuntu 24.04 based container with SCP-only SSH service (SFTP disabled).
+
+- **Location**: [dockers/scp-only/](dockers/scp-only/)
+- **Features**:
+  - Ubuntu 24.04 base image
+  - SSH service enabled (root/root)
+  - SCP allowed, SFTP disabled
+  - Port: 22235
+  - Uses Aliyun CN mirror for faster downloads
+- **Usage**:
+  ```bash
+  cd dockers/scp-only
+  docker-compose up -d --build
+  node test-ssh.js
+  ```
+- **Testing**: SSH connection test using ssh2 library, verifies SFTP is disabled and SCP is available
+
 ## License
 
 MIT

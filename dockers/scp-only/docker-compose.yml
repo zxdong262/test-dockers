@@ -1,0 +1,13 @@
+services:
+  scp-only:
+    build: .
+    container_name: scp-only-container
+    ports:
+      - "22235:22"
+    restart: unless-stopped
+    networks:
+      - scp-only-network
+
+networks:
+  scp-only-network:
+    driver: bridge
