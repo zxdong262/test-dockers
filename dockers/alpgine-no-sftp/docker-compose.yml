@@ -1,0 +1,13 @@
+services:
+  open-rt:
+    build: .
+    container_name: open-rt-container
+    ports:
+      - "22236:22"
+    restart: unless-stopped
+    networks:
+      - open-rt-network
+
+networks:
+  open-rt-network:
+    driver: bridge
