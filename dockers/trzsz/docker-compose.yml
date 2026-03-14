@@ -4,6 +4,7 @@ services:
     container_name: trzsz-container
     ports:
       - "22234:22"
+      - "22237:21"
     restart: unless-stopped
     networks:
       - trzsz-network

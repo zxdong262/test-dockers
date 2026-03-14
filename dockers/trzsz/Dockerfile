@@ -7,6 +7,9 @@ RUN sed -i 's|http://archive.ubuntu.com|https://mirrors.aliyun.com|g' /etc/apt/s
 
 RUN apt-get update && apt-get install -y \
     openssh-server \
+    telnetd \
+    inetutils-inetd \
+    lrzsz \
     curl \
     iproute2 \
     && rm -rf /var/lib/apt/lists/*
@@ -26,6 +29,10 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo '#!/bin/bash\n\
+touch /etc/inetd.conf\n\
+echo "telnet stream tcp nowait root /usr/sbin/in.telnetd in.telnetd" > /etc/inetd.conf\n\
+sed -i "s|23|21|g" /etc/inetd.conf\n\
+/usr/sbin/inetutils-inetd /etc/inetd.conf\n\
 tc qdisc del dev eth0 root 2>/dev/null || true\n\
 tc qdisc del dev eth0 ingress 2>/dev/null || true\n\
 tc qdisc add dev eth0 root handle 1: htb default 10\n\
@@ -34,6 +41,6 @@ tc class add dev eth0 parent 1:1 classid 1:10 htb rate 5mbit ceil 5mbit\n\
 tc qdisc add dev eth0 parent 1:10 handle 10: sfq perturb 10\n\
 /usr/sbin/sshd -D' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
-EXPOSE 22
+EXPOSE 22 21
 
 CMD ["/usr/local/bin/start.sh"]
