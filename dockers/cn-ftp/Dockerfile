@@ -1,7 +1,7 @@
 FROM amazonlinux:2
 
 # Install vsftpd and required packages including Chinese locale support
-RUN yum update -y && yum install -y vsftpd glibc-common glibc-locale-source glibc-langpack-zh shadow-utils
+RUN yum update -y && yum install -y vsftpd glibc-common glibc-locale-source glibc-langpack-zh shadow-utils openssh-server
 
 # Set locale to Chinese GBK - this makes the system use GBK encoding
 # When UTF8 client connects, it will show garbled text
@@ -61,14 +61,19 @@ RUN echo "anonymous_enable=NO" > /etc/vsftpd/vsftpd.conf && \
 RUN echo 'export LANG=zh_CN.GBK' >> /etc/bashrc && \
     echo 'export LC_ALL=zh_CN.GBK' >> /etc/bashrc
 
+# Configure SSH
+RUN ssh-keygen -A && \
+    mkdir -p /run/sshd
+
 # Create startup script
-RUN echo '#!/bin/bash' > /usr/local/bin/start-vsftpd.sh && \
-    echo 'export LANG=zh_CN.GBK' >> /usr/local/bin/start-vsftpd.sh && \
-    echo 'export LC_ALL=zh_CN.GBK' >> /usr/local/bin/start-vsftpd.sh && \
-    echo 'source /etc/locale.conf' >> /usr/local/bin/start-vsftpd.sh && \
-    echo 'exec /usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf' >> /usr/local/bin/start-vsftpd.sh && \
-    chmod +x /usr/local/bin/start-vsftpd.sh
+RUN echo '#!/bin/bash' > /usr/local/bin/start-services.sh && \
+    echo 'export LANG=zh_CN.GBK' >> /usr/local/bin/start-services.sh && \
+    echo 'export LC_ALL=zh_CN.GBK' >> /usr/local/bin/start-services.sh && \
+    echo 'source /etc/locale.conf' >> /usr/local/bin/start-services.sh && \
+    echo '/usr/sbin/sshd' >> /usr/local/bin/start-services.sh && \
+    echo 'exec /usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf' >> /usr/local/bin/start-services.sh && \
+    chmod +x /usr/local/bin/start-services.sh
 
-EXPOSE 21 40000-40100
+EXPOSE 21 22 40000-40100
 
-CMD ["/usr/local/bin/start-vsftpd.sh"]
+CMD ["/usr/local/bin/start-services.sh"]

@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 root@localhost whoami
+expect {
+    "Password:" {
+        send "root\r"
+        exp_continue
+    }
+    "Verification code:" {
+        puts "Please enter the code from Microsoft Authenticator"
+        exit 1
+    }
+    "Permission denied" {
+        puts "Authentication failed"
+        exit 1
+    }
+    "$ " {
+        send "whoami\r"
+    }
+}
+expect eof

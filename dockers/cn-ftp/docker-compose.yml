@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  cn-ftp:
+    build: .
+    container_name: cn-ftp
+    ports:
+      - "2121:21"
+      - "21212:22"
+      - "40000-40100:40000-40100"
+    environment:
+      - FTP_USER=ftpuser
+      - FTP_PASS=ftppass
+    restart: unless-stopped
