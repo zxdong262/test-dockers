@@ -1,0 +1,7 @@
+services:
+  ssh-timeout:
+    build: .
+    ports:
+      - "21220:22"
+    environment:
+      - TZ=Asia/Shanghai
