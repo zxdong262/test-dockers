@@ -12,7 +12,10 @@ RUN apt-get update && apt-get install -y \
     lrzsz \
     curl \
     iproute2 \
+    libsixel-bin \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -L https://github.com/atanunq/viu/releases/download/v1.4.0/viu -o /usr/local/bin/viu && chmod +x /usr/local/bin/viu
 
 RUN mkdir /var/run/sshd
 

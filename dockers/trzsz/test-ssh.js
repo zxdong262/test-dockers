@@ -16,7 +16,7 @@ console.log(`Username: ${config.username}`);
 conn.on('ready', () => {
   console.log('✓ SSH connection established successfully!');
   
-  conn.exec('which trz && which tsz', (err, stream) => {
+  conn.exec('which trz && which tsz && which viu && which img2sixel', (err, stream) => {
     if (err) {
       console.error('✗ Error executing command:', err);
       conn.end();
