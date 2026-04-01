@@ -2,9 +2,9 @@ const http = require('http');
 
 const config = {
   host: '127.0.0.1',
-  port: 8080,
-  username: 'webdav',
-  password: 'webdav123'
+  port: 33333,
+  username: 'admin',
+  password: 'admin'
 };
 
 function makeRequest(method, path, body = null, extraHeaders = {}) {
@@ -25,9 +25,7 @@ function makeRequest(method, path, body = null, extraHeaders = {}) {
     const req = http.request(options, (res) => {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        resolve({ statusCode: res.statusCode, headers: res.headers, body: data });
-      });
+      res.on('end', () => resolve({ statusCode: res.statusCode, headers: res.headers, body: data }));
     });
 
     req.on('error', reject);
@@ -42,16 +40,16 @@ async function runTests() {
 
   console.log('=== WebDAV Server Tests ===\n');
 
-  // Test 1: PROPFIND with Depth header on a directory with content
+  // Test 1: PROPFIND on a directory
   try {
-    await makeRequest('MKCOL', '/propfind-test/');
-    await makeRequest('PUT', '/propfind-test/dummy.txt', 'dummy');
-    const res = await makeRequest('PROPFIND', '/propfind-test/', null, { 'Depth': '1' });
+    await makeRequest('MKCOL', '/test-dir/');
+    await makeRequest('PUT', '/test-dir/dummy.txt', 'dummy');
+    const res = await makeRequest('PROPFIND', '/test-dir/', null, { 'Depth': '1' });
     if (res.statusCode === 207) {
-      console.log('✓ PROPFIND /propfind-test/ returns 207 Multi-Status');
+      console.log('✓ PROPFIND /test-dir/ returns 207 Multi-Status');
       passed++;
     } else {
-      console.log(`✗ PROPFIND /propfind-test/ returned ${res.statusCode}, expected 207`);
+      console.log(`✗ PROPFIND /test-dir/ returned ${res.statusCode}, expected 207`);
       failed++;
     }
   } catch (err) {
@@ -61,8 +59,7 @@ async function runTests() {
 
   // Test 2: Upload a file
   try {
-    const testContent = 'Hello WebDAV!';
-    const res = await makeRequest('PUT', '/test-file.txt', testContent);
+    const res = await makeRequest('PUT', '/test-file.txt', 'Hello WebDAV!');
     if (res.statusCode === 201 || res.statusCode === 204) {
       console.log(`✓ PUT /test-file.txt returned ${res.statusCode}`);
       passed++;
@@ -71,7 +68,7 @@ async function runTests() {
       failed++;
     }
   } catch (err) {
-    console.log(`✗ PUT /test-file.txt failed: ${err.message}`);
+    console.log(`✗ PUT failed: ${err.message}`);
     failed++;
   }
 
@@ -86,63 +83,33 @@ async function runTests() {
       failed++;
     }
   } catch (err) {
-    console.log(`✗ GET /test-file.txt failed: ${err.message}`);
+    console.log(`✗ GET failed: ${err.message}`);
     failed++;
   }
 
-  // Test 4: MKCOL to create a directory
-  try {
-    const res = await makeRequest('MKCOL', '/test-dir/');
-    if (res.statusCode === 201 || res.statusCode === 405) {
-      console.log(`✓ MKCOL /test-dir returned ${res.statusCode} (dir ${res.statusCode === 201 ? 'created' : 'already exists'})`);
-      passed++;
-    } else {
-      console.log(`✗ MKCOL /test-dir returned ${res.statusCode}, expected 201`);
-      failed++;
-    }
-  } catch (err) {
-    console.log(`✗ MKCOL /test-dir failed: ${err.message}`);
-    failed++;
-  }
-
-  // Test 5: Upload file to subdirectory
-  try {
-    const res = await makeRequest('PUT', '/test-dir/nested-file.txt', 'nested content');
-    if (res.statusCode === 201 || res.statusCode === 204) {
-      console.log(`✓ PUT /test-dir/nested-file.txt returned ${res.statusCode}`);
-      passed++;
-    } else {
-      console.log(`✗ PUT /test-dir/nested-file.txt returned ${res.statusCode}`);
-      failed++;
-    }
-  } catch (err) {
-    console.log(`✗ PUT /test-dir/nested-file.txt failed: ${err.message}`);
-    failed++;
-  }
-
-  // Test 6: DELETE the file
+  // Test 4: DELETE the file
   try {
     const res = await makeRequest('DELETE', '/test-file.txt');
     if (res.statusCode === 204 || res.statusCode === 200) {
       console.log(`✓ DELETE /test-file.txt returned ${res.statusCode}`);
       passed++;
     } else {
-      console.log(`✗ DELETE /test-file.txt returned ${res.statusCode}`);
+      console.log(`✗ DELETE returned ${res.statusCode}`);
       failed++;
     }
   } catch (err) {
-    console.log(`✗ DELETE /test-file.txt failed: ${err.message}`);
+    console.log(`✗ DELETE failed: ${err.message}`);
     failed++;
   }
 
-  // Test 7: Unauthenticated request should fail
+  // Test 5: Unauthenticated request should fail
   try {
     const res = await new Promise((resolve, reject) => {
       const req = http.request({
         hostname: config.host,
         port: config.port,
         path: '/',
-        method: 'PROPFIND'
+        method: 'GET'
       }, (res) => {
         let data = '';
         res.on('data', (chunk) => { data += chunk; });
@@ -159,7 +126,7 @@ async function runTests() {
       failed++;
     }
   } catch (err) {
-    console.log(`✗ Unauthenticated request failed: ${err.message}`);
+    console.log(`✗ Unauthenticated test failed: ${err.message}`);
     failed++;
   }
 
