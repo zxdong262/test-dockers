@@ -1,0 +1,22 @@
+services:
+  webdav:
+    image: bytemark/webdav
+    container_name: webdav-server
+    environment:
+      AUTH_TYPE: Basic
+      USERNAME: webdav
+      PASSWORD: webdav123
+    ports:
+      - "8080:80"
+    volumes:
+      - webdav-data:/var/lib/dav
+    restart: unless-stopped
+    networks:
+      - webdav-network
+
+volumes:
+  webdav-data:
+
+networks:
+  webdav-network:
+    driver: bridge
